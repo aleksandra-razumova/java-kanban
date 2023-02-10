@@ -1,22 +1,13 @@
 public class Task {
+    private String name;
+    private String description;
+    private int id;
+    private Status status;
+
     public Task(String name, String description, Status status) {
         this.name = name;
         this.description = description;
         this.status = status;
-    }
-
-    private String name;
-    private String description;
-    protected static int id=0;
-
-
-
-    private Status status;
-
-    protected enum Status {
-        NEW,
-        IN_PROGRESS,
-        DONE,
     }
 
     public int getId() {
