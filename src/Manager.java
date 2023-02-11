@@ -86,28 +86,28 @@ public class Manager {
     private void updateStatusEpics(Epic epic) {
         int countNew = 0;
         int countDone = 0;
+        List<Long> subtaskIds = epic.getSubtasks();
 
-        if (epic.getSubtasks().size() != 0) {
-            for (int i = 0; i < epic.getSubtasks().size(); i++) {
-                if (subtasks.get(epic.getSubtasks().get(i)).getStatus().equals(Status.NEW)) {
-                    countNew += 1;
-                } else if (subtasks.get(epic.getSubtasks().get(i)).getStatus().equals(Status.DONE)) {
-                    countDone += 1;
-                } else {
-                    epic.setStatus(Status.IN_PROGRESS);
-                }
-            }
-            if (countNew == epic.getSubtasks().size()) {
-                epic.setStatus(Status.NEW);
-            } else if (countDone == epic.getSubtasks().size()) {
-                epic.setStatus(Status.DONE);
+        for (long subtaskId : subtaskIds) {
+            Status status = subtasks.get(subtaskId).getStatus();
+            if (status.equals(Status.NEW)) {
+                countNew++;
+            } else if (status.equals(Status.DONE)) {
+                countDone++;
             } else {
                 epic.setStatus(Status.IN_PROGRESS);
+                return;
             }
-        } else {
+        }
+        if (countNew == subtaskIds.size()) {
             epic.setStatus(Status.NEW);
+        } else if (countDone == subtaskIds.size()) {
+            epic.setStatus(Status.DONE);
+        } else {
+            epic.setStatus(Status.IN_PROGRESS);
         }
     }
+
 
     public List<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
