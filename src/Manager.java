@@ -1,107 +1,116 @@
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Manager {
-    private int generateId;
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
-    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    private long generateId;
+    private final HashMap<Long, Task> tasks = new HashMap<>();
+    private final HashMap<Long, Epic> epics = new HashMap<>();
+    private final HashMap<Long, Subtask> subtasks = new HashMap<>();
 
-    public Task getOneTask (int id){
-        if (tasks.containsKey(id)){
+    public Task getOrDefault(long id) {
+        if (tasks.containsKey(id)) {
             return tasks.get(id);
-        } else if (epics.containsKey(id)){
-            return (Task) epics.get(id);
-        } else if (subtasks.containsKey(id)){
-            return (Task) subtasks.get(id);
-        } else {
-            return null;
-        }
+        } else if (epics.containsKey(id)) {
+            return epics.get(id);
+        } else return subtasks.getOrDefault(id, null);
     }
 
-    public HashMap<Integer, Task> addTask(Task task){
-     task.setId(++generateId);
-     tasks.put(generateId, task);
-     return tasks;
+    public void addTask(Task task) {
+        task.setId(++generateId);
+        tasks.put(generateId, task);
     }
 
-    public HashMap<Integer, Epic> addEpic(Epic epic){
+    public void addEpic(Epic epic) {
+        List<Long> subtasks = new ArrayList<>();
         epic.setId(++generateId);
         epics.put(generateId, epic);
-        return epics;
     }
 
-    public Subtask addSubtask(Subtask subtask, int epicsId){
+    public Subtask addSubtask(Subtask subtask) {
         subtask.setId(++generateId);
-        epics.get(epicsId).getSubtasks().add(subtask);
-        subtask.setEpic(epics.get(epicsId));
+        Epic epic = epics.get(subtask.getEpicId());
+        epic.getSubtasks().add(subtask.getId());
         subtasks.put(generateId, subtask);
+        updateEpic(epic);
         return subtask;
     }
 
-    public Task changeStatus(int id, Status status) {
-        if (tasks.containsKey(id)) {
-            tasks.get(id).setStatus(status);
-            return tasks.get(id);
-        } else if (subtasks.containsKey(id)) {
-            subtasks.get(id).setStatus(status);
-            return (Task) subtasks.get(id);
-        }else{
-            return null;
+    public void deleteAllTasks() {
+        tasks.clear();
+    }
+
+    public void deleteAllEpics() {
+        epics.clear();
+        subtasks.clear();
+    }
+
+    public void deleteAllSubtasks() {
+        subtasks.clear();
+        for (Epic epic : epics.values()) {
+            epic.getSubtasks().clear();
+            updateEpic(epic);
         }
     }
 
-    public void deleteAllTasks(){
-        tasks.clear();
-    }
-    public void deleteAllEpics(){
-        epics.clear();
-    }
-    public void deleteAllSubtasks(){
-        subtasks.clear();
-    }
-    public void deleteTask(int id){
+    public void deleteTask(long id) {
         tasks.remove(id);
     }
-    public void deleteEpic(int id){
+
+    public void deleteEpic(long id) {
+        for (Subtask subtask : subtasks.values()) {
+            if (subtask.getEpicId() == id) {
+                subtasks.remove(subtask);
+            }
+        }
         epics.remove(id);
     }
-    public void deleteSubtask(int id){
+
+    public void deleteSubtask(long id) {
+        for (Epic epic : epics.values()) {
+            if (epic.getSubtasks().get((int)id) == id) {
+                epic.getSubtasks().remove(id);
+            }
+        }
         subtasks.remove(id);
     }
 
-    public void updateTask(int id, Task task){
-        tasks.put(id, task);
+    public void updateTask(Task task) {
+        tasks.put(task.getId(), task);
     }
-    public void updateSubtask(int id, Subtask subtask){
-        tasks.put(id, subtask);
-    }
-    public void updateEpics(Epic epic){
 
-            for (int i=0; i< epic.getSubtasks().size(); i++){
-                if (epic.getSubtasks().get(i).getStatus().equals(Status.IN_PROGRESS)){
-                    epic.setStatus(Status.IN_PROGRESS);
-                } else if (epic.getSubtasks().get(i).getStatus().equals(Status.NEW)){
-                    epic.setStatus(Status.NEW);
-                } else {
-                    epic.setStatus(Status.DONE);
-                }
+    public void updateSubtask(Subtask subtask) {
+        subtasks.put(subtask.getId(), subtask);
+        updateStatusEpics(epics.get(subtask.getEpicId()));
+    }
+
+    public void updateEpic(Epic epic) {
+        updateStatusEpics(epic);
+        epics.put(epic.getId(), epic);
+    }
+
+    private void updateStatusEpics(Epic epic) {
+        for (int i = 0; i < epic.getSubtasks().size(); i++) {
+            if (subtasks.get(epic.getSubtasks().get(i)).getStatus().equals(Status.IN_PROGRESS)) {
+                epic.setStatus(Status.IN_PROGRESS);
+            } else if (subtasks.get(epic.getSubtasks().get(i)).getStatus().equals(Status.NEW)) {
+                epic.setStatus(Status.NEW);
+            } else {
+                epic.setStatus(Status.DONE);
             }
         }
+    }
 
-    public void getAllTasks(){
-        for (Task task: tasks.values()){
-            System.out.println(task.getName()+" "+task.getDescription()+" "+task.getStatus());
-        }
+    public ArrayList<Task> getAllTasks() {
+        return new ArrayList<>(tasks.values());
     }
-    public void getAllEpics(){
-        for (Epic epic: epics.values()){
-            System.out.println(epic.getName()+" "+epic.getDescription()+" "+epic.getStatus());
-        }
+
+    public ArrayList<Epic> getAllEpics() {
+        return new ArrayList<>(epics.values());
     }
-    public void getAllSubtasks(){
-        for (Subtask subtask: subtasks.values()){
-            System.out.println(subtask.getName()+" "+subtask.getDescription()+" "+subtask.getStatus());
-        }
+
+    public ArrayList<Subtask> getAllSubtasks() {
+        return new ArrayList<>(subtasks.values());
     }
 }
 
