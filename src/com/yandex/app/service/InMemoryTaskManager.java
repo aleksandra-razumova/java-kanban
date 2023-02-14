@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InMemoryTaskManager extends InMemoryHistoryManager implements TaskManager {
+public class InMemoryTaskManager implements TaskManager {
+
+    private final HistoryManager inMemoryHistoryManager = Managers.getDefaultHistory();
     private long generateId;
     private final Map<Long, Task> tasks = new HashMap<>();
     private final Map<Long, Epic> epics = new HashMap<>();
@@ -23,9 +25,11 @@ public class InMemoryTaskManager extends InMemoryHistoryManager implements TaskM
         } else if (epics.containsKey(id)) {
             add(epics.get(id));
             return epics.get(id);
+        } else if (subtasks.containsKey(id)){
+            add(subtasks.get(id));
+            return subtasks.get(id);
         } else {
-            add(subtasks.getOrDefault(id, null));
-            return subtasks.getOrDefault(id, null);
+            return null;
         }
     }
 
@@ -145,6 +149,16 @@ public class InMemoryTaskManager extends InMemoryHistoryManager implements TaskM
     @Override
     public List<Subtask> getAllSubtasks() {
         return new ArrayList<>(subtasks.values());
+    }
+
+    @Override
+    public void add(Task task) {
+        inMemoryHistoryManager.add(task);
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return inMemoryHistoryManager.getHistory();
     }
 }
 
