@@ -1,6 +1,12 @@
+package com.yandex.app.service;
+
+import com.yandex.app.model.Epic;
+import com.yandex.app.model.Subtask;
+import com.yandex.app.model.Task;
+
 import java.util.List;
 
-public interface TaskManager {
+public interface TaskManager extends HistoryManager {
 
     Task getOrDefault(long id);
 
@@ -8,7 +14,7 @@ public interface TaskManager {
 
     void addEpic(Epic epic);
 
-    Subtask addSubtask(Subtask subtask);
+    void addSubtask(Subtask subtask);
 
     void deleteAllTasks();
 

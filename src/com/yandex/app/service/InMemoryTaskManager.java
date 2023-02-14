@@ -1,22 +1,32 @@
+package com.yandex.app.service;
+
+import com.yandex.app.model.Epic;
+import com.yandex.app.model.Subtask;
+import com.yandex.app.model.Task;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class InMemoryTaskManager implements TaskManager {
+public class InMemoryTaskManager extends InMemoryHistoryManager implements TaskManager {
     private long generateId;
-    private final HashMap<Long, Task> tasks = new HashMap<>();
-    private final HashMap<Long, Epic> epics = new HashMap<>();
-    private final HashMap<Long, Subtask> subtasks = new HashMap<>();
-    private final List<Task> history = new ArrayList<>();
-
+    private final Map<Long, Task> tasks = new HashMap<>();
+    private final Map<Long, Epic> epics = new HashMap<>();
+    private final Map<Long, Subtask> subtasks = new HashMap<>();
 
     @Override
     public Task getOrDefault(long id) {
         if (tasks.containsKey(id)) {
+            add(tasks.get(id));
             return tasks.get(id);
         } else if (epics.containsKey(id)) {
+            add(epics.get(id));
             return epics.get(id);
-        } else return subtasks.getOrDefault(id, null);
+        } else {
+            add(subtasks.getOrDefault(id, null));
+            return subtasks.getOrDefault(id, null);
+        }
     }
 
     @Override
@@ -32,13 +42,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask addSubtask(Subtask subtask) {
+    public void addSubtask(Subtask subtask) {
         subtask.setId(++generateId);
         Epic epic = epics.get(subtask.getEpicId());
         epic.getSubtasks().add(subtask.getId());
         subtasks.put(generateId, subtask);
         updateStatusEpics(epic);
-        return subtask;
     }
 
     @Override

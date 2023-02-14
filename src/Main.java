@@ -1,8 +1,13 @@
+import com.yandex.app.model.Epic;
+import com.yandex.app.model.Subtask;
+import com.yandex.app.model.Task;
+import com.yandex.app.service.*;
+
 public class Main {
     public static void main(String[] args) {
 
-        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
-        InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
+        TaskManager inMemoryTaskManager = Managers.getDefault();
+        HistoryManager inMemoryHistoryManager = Managers.getDefaultHistory();
 
         inMemoryTaskManager.addTask(new Task("Купить продукты", "Сходить в магазин", Status.NEW));
         inMemoryTaskManager.addTask(new Task("Приготовить ужин", "Фрикасе из кролика",
@@ -38,6 +43,7 @@ public class Main {
         System.out.println(inMemoryTaskManager.getOrDefault(3).getStatus());
 
         inMemoryTaskManager.deleteTask(1);
+
 
         inMemoryHistoryManager.add(inMemoryTaskManager.getOrDefault(2));
         inMemoryHistoryManager.add(inMemoryTaskManager.getOrDefault(5));
