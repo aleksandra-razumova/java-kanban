@@ -20,34 +20,30 @@ public class Main {
                 Status.IN_PROGRESS, 3));
         taskManager.addSubtask(new Subtask("Написать проект", "За вторую неделю сдать проект",
                 Status.IN_PROGRESS, 3));
+        taskManager.addSubtask(new Subtask("Прочитать книгу", "ООП для чайников",
+                Status.DONE, 3));
 
         taskManager.addEpic(new Epic("Написать отзыв на книгу", "500 слов"));
-        taskManager.addSubtask(new Subtask("Прочитать книгу", "Унесенные ветром",
-                Status.DONE, 6));
 
-        for (int i = 0; i < taskManager.getAllTasks().size(); i++) {
-            System.out.println(taskManager.getAllTasks().get(i).getName());
+        taskManager.getOrDefault(2);
+        taskManager.getOrDefault(3);
+        taskManager.getOrDefault(2);
+        taskManager.getOrDefault(5);
+        taskManager.getOrDefault(6);
+        taskManager.getOrDefault(7);
+        taskManager.getOrDefault(2);
+
+        for (int i = 0; i < taskManager.getHistory().size(); i++) {
+            System.out.println(taskManager.getHistory().get(i).getName());
         }
+        System.out.println("***");
+        taskManager.remove(2);
 
-        for (int i = 0; i < taskManager.getAllSubtasks().size(); i++) {
-            System.out.println(taskManager.getAllSubtasks().get(i).getName());
+        for (int i = 0; i < taskManager.getHistory().size(); i++) {
+            System.out.println(taskManager.getHistory().get(i).getName());
         }
-
-        for (int i = 0; i < taskManager.getAllEpics().size(); i++) {
-            System.out.println(taskManager.getAllEpics().get(i).getName());
-        }
-
-        taskManager.getAllSubtasks().get(0).setStatus(Status.DONE);
-        taskManager.getAllSubtasks().get(1).setStatus(Status.DONE);
-
-        taskManager.updateEpic((Epic) taskManager.getOrDefault(3));
-        System.out.println(taskManager.getOrDefault(3).getStatus());
-
-        taskManager.deleteTask(1);
-
-        taskManager.add(taskManager.getOrDefault(2));
-        taskManager.add(taskManager.getOrDefault(5));
-        taskManager.add(taskManager.getOrDefault(6));
+        System.out.println("***");
+        taskManager.deleteEpic(3);
 
         for (int i = 0; i < taskManager.getHistory().size(); i++) {
             System.out.println(taskManager.getHistory().get(i).getName());

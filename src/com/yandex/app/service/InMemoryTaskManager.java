@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private final HistoryManager inMemoryHistoryManager = Managers.getDefaultHistory();
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
     private long generateId;
     private final Map<Long, Task> tasks = new HashMap<>();
     private final Map<Long, Epic> epics = new HashMap<>();
@@ -19,15 +19,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getOrDefault(long id) {
+        Task task = tasks.get(id);
+        Subtask subtask = subtasks.get(id);
+        Epic epic = epics.get(id);
+
         if (tasks.containsKey(id)) {
-            add(tasks.get(id));
-            return tasks.get(id);
+            add(task);
+            return task;
         } else if (epics.containsKey(id)) {
-            add(epics.get(id));
-            return epics.get(id);
-        } else if (subtasks.containsKey(id)){
-            add(subtasks.get(id));
-            return subtasks.get(id);
+            add(epic);
+            return epic;
+        } else if (subtasks.containsKey(id)) {
+            add(subtask);
+            return subtask;
         } else {
             return null;
         }
@@ -77,13 +81,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTask(long id) {
         tasks.remove(id);
+        remove(id);
     }
 
     @Override
     public void deleteEpic(long id) {
         for (Long subtaskId : epics.remove(id).getSubtasks()) {
             subtasks.remove(subtaskId);
+            remove(subtaskId);
         }
+        remove(id);
     }
 
     @Override
@@ -92,6 +99,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(epicId);
         epic.getSubtasks().remove(id);
         updateStatusEpics(epic);
+        remove(id);
     }
 
     @Override
@@ -153,12 +161,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void add(Task task) {
-        inMemoryHistoryManager.add(task);
+        historyManager.add(task);
     }
 
     @Override
     public List<Task> getHistory() {
-        return inMemoryHistoryManager.getHistory();
+        return historyManager.getHistory();
+    }
+
+    @Override
+    public void remove(long id) {
+        historyManager.remove(id);
     }
 }
 
