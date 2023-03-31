@@ -6,9 +6,9 @@ import com.yandex.app.model.Task;
 
 import java.util.List;
 
-public interface TaskManager extends HistoryManager {
+public interface TaskManager {
 
-    Task getOrDefault(long id);
+    Task getById(long id);
 
     void addTask(Task task);
 
@@ -39,6 +39,7 @@ public interface TaskManager extends HistoryManager {
     List<Epic> getAllEpics();
 
     List<Subtask> getAllSubtasks();
+    List<Task> getHistory();
 
 }
 

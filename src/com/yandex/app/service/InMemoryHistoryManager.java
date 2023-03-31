@@ -6,10 +6,9 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final CustomLinkedList<Task> history = new CustomLinkedList<>();
-    private static final int HISTORY_SIZE = 10;
-    private final HashMap<Long, Node> idAndNodes = new HashMap<>();
+    private final Map<Long, Node<Task>> idAndNodes = new HashMap<>();
 
-    public static class CustomLinkedList<T> {
+    private static class CustomLinkedList<T> {
         public Node<T> first;
         public Node<T> last;
         private int size = 0;
@@ -22,17 +21,17 @@ public class InMemoryHistoryManager implements HistoryManager {
             if (oldLast == null) {
                 first = newNode;
             } else {
-                oldLast.next = newNode;
+                oldLast.setNext(newNode);
             }
             size++;
         }
 
-        public ArrayList<Task> getTasks() { //Собирает все задачи в обычный ArrayList
-            ArrayList<Task> allOfElements = new ArrayList<>();
-            Node current = first;
+        public LinkedList<T> getTasks() { //Собирает все задачи в обычный ArrayList
+            LinkedList<T> allOfElements = new LinkedList<>();
+            Node <T> current = first;
             while (current != null) {
-                allOfElements.add((Task) current.item);
-                current = current.next;
+                allOfElements.add(current.getItem());
+                current = current.getNext();
             }
             return allOfElements;
         }
@@ -41,17 +40,19 @@ public class InMemoryHistoryManager implements HistoryManager {
             if (nodeToRemove == null) {
                 return;
             }
+            final Node<T> next = nodeToRemove.getNext();
+            final Node<T> prev = nodeToRemove.getPrev();
             if (nodeToRemove == first) {
-                first = nodeToRemove.next;
+                first = next;
             }
             if (nodeToRemove == last) {
-                last = nodeToRemove.prev;
+                last = prev;
             }
-            if (nodeToRemove.prev != null) {
-                nodeToRemove.prev.next = nodeToRemove.next;
+            if (prev != null) {
+                prev.setNext(next);
             }
-            if (nodeToRemove.next != null) {
-                nodeToRemove.next.prev = nodeToRemove.prev;
+            if (next!= null) {
+                next.setPrev(prev);
             }
             size--;
         }
@@ -59,7 +60,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        return List.copyOf(history.getTasks());
+        return history.getTasks();
     }
 
     @Override
@@ -70,21 +71,14 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         if (idAndNodes.containsKey(task.getId())) {
             history.removeNode(idAndNodes.get(task.getId()));
-            idAndNodes.remove(task.getId());
         }
 
-        if (history.size >= HISTORY_SIZE) {
-            history.removeNode(history.first);
-            idAndNodes.remove(0);
-        }
         history.linkLast(task);
         idAndNodes.put(task.getId(), history.last);
     }
 
     @Override
     public void remove(long id) {
-        history.removeNode(idAndNodes.get(id));
-        idAndNodes.remove(id);
-        history.size--;
+        history.removeNode(idAndNodes.remove(id));
     }
 }

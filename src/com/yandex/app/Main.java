@@ -25,28 +25,30 @@ public class Main {
 
         taskManager.addEpic(new Epic("Написать отзыв на книгу", "500 слов"));
 
-        taskManager.getOrDefault(2);
-        taskManager.getOrDefault(3);
-        taskManager.getOrDefault(2);
-        taskManager.getOrDefault(5);
-        taskManager.getOrDefault(6);
-        taskManager.getOrDefault(7);
-        taskManager.getOrDefault(2);
-
+        taskManager.getById(2);
+        taskManager.getById(3);
+        taskManager.getById(2);
+        taskManager.getById(5);
+        taskManager.getById(6);
+        taskManager.getById(7);
+        taskManager.getById(2);
+        
         for (int i = 0; i < taskManager.getHistory().size(); i++) {
             System.out.println(taskManager.getHistory().get(i).getName());
-        }
+       }
+
         System.out.println("***");
-        taskManager.remove(2);
-
+        taskManager.deleteTask(2);
         for (int i = 0; i < taskManager.getHistory().size(); i++) {
             System.out.println(taskManager.getHistory().get(i).getName());
         }
+
         System.out.println("***");
         taskManager.deleteEpic(3);
-
         for (int i = 0; i < taskManager.getHistory().size(); i++) {
             System.out.println(taskManager.getHistory().get(i).getName());
         }
     }
 }
+
+
